@@ -81,6 +81,11 @@
                                                 <action selector="shareAction:" destination="BYZ-38-t0r" id="zmL-Zv-CnY"/>
                                             </connections>
                                         </barButtonItem>
+                                        <barButtonItem key="rightBarButtonItem" title="Cancel" id="qff-ki-JYi">
+                                            <connections>
+                                                <action selector="cancelReset:" destination="BYZ-38-t0r" id="9qv-0H-vAy"/>
+                                            </connections>
+                                        </barButtonItem>
                                     </navigationItem>
                                 </items>
                             </navigationBar>

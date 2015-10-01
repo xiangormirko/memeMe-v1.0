@@ -218,5 +218,17 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let meme = Meme(stringTop: textTop.text!, stringBottom: textBottom.text!, image: memeImage.image!, memedImage: generateMemedImage())
     }
     
+    @IBAction func cancelReset(sender: AnyObject) {
+        // pressing cancel button resets the view to original state
+        self.memeImage.image = nil
+        self.textTop.text = "Insert your Text".uppercaseString
+        textBottom.text = "Insert your Text".uppercaseString
+        textTop.defaultTextAttributes = memeTextAttributes
+        textBottom.defaultTextAttributes = memeTextAttributes
+        textTop.textAlignment = NSTextAlignment.Center
+        textBottom.textAlignment = NSTextAlignment.Center
+        textTop.autocapitalizationType = UITextAutocapitalizationType.AllCharacters
+        shareButton.enabled = false
+    }
 }
 
