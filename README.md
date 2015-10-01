@@ -1,5 +1,5 @@
 # memeMe-v1.0
-Version 1.0 of the memeMe app for Udacity nanodegree
+Version 1.0 of the memeMe app for Udacity nanodegree completed by Mirko Xiang Zhao
 
 GENERAL DESCRIPTION
 
