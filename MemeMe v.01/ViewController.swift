@@ -18,6 +18,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var navbar: UINavigationBar!
     @IBOutlet weak var toolbar: UIToolbar!
     
+    // text default attributes
     let memeTextAttributes = [
         NSStrokeColorAttributeName : UIColor.blackColor(),
         NSForegroundColorAttributeName : UIColor.whiteColor(),
@@ -25,6 +26,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         NSStrokeWidthAttributeName : -4.0
     ]
     
+    // class Meme with initializer
     class Meme {
         var stringTop: String
         var stringBottom: String
@@ -39,10 +41,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         }
     }
 
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        // setting up textFields
         textTop.delegate = self
         textBottom.delegate = self
         textTop.text = "Insert your Text".uppercaseString
@@ -57,8 +58,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        // Notification subscription
         self.subscribeToKeyboardNotifications()
         self.subscribeToKeyboardNotificationDismiss()
+        // Disable camera button if there is no camera
         cameraButton.enabled = UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)
         
         
@@ -66,6 +69,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+        // Notification unsubscription
         self.unsubscribeFromKeyboardNotifications()
         self.unsubscribeFromKeyboardNotificationDismiss()
     }
@@ -73,6 +77,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
 
 
     @IBAction func pickImage(sender: AnyObject) {
+        // create a view to pick images
         let pickerController = UIImagePickerController()
         pickerController.delegate = self
         pickerController.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
@@ -81,6 +86,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
     }
     @IBAction func takePhoto(sender: AnyObject) {
+        // create a view to take a picture
         let pickerController = UIImagePickerController()
         pickerController.delegate = self
         pickerController.sourceType = UIImagePickerControllerSourceType.Camera
@@ -89,12 +95,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        // set image selected by user
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            //let rect1 = CGRect(origin: CGPoint(x: 0, y: 100), size: CGSize(width: 414.0, height: 414.0))
             self.memeImage.contentMode = .ScaleAspectFill
             self.memeImage.image = image
             shareButton.enabled = true
-            //self.memeImage.bounds = rect1
 
 
             self.dismissViewControllerAnimated(true, completion: nil)
@@ -155,12 +160,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     // Function to chapitalize all characters
     func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
         var replacedChar = false
-        // Figure out what the new text will be, if we return true
+        // Replace lower case characters
         var newText = textField.text as! NSString
         newText = newText.stringByReplacingCharactersInRange(range, withString: string)
-        
         var lowercaseCharRange : NSRange
-        
         lowercaseCharRange = newText.rangeOfCharacterFromSet(NSCharacterSet .lowercaseLetterCharacterSet())
         
         if (lowercaseCharRange.location != NSNotFound) {
@@ -178,7 +181,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     func generateMemedImage() -> UIImage {
-        
+        // capture a meme with overlay text, hide not needed features
         navbar.hidden = true
         toolbar.hidden = true
         textTop.hidden = true
@@ -197,6 +200,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     @IBAction func shareAction(sender: AnyObject) {
+        // Create an activity view and pass the selected image
         let memedImage = generateMemedImage()
         let nextController = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
         nextController.completionWithItemsHandler = {(type: String?, completed: Bool, returnedItems: [AnyObject]?, error: NSError?) -> Void in
@@ -205,18 +209,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             }
         }
         presentViewController(nextController, animated: true, completion: nil)
-        save()git
+        save()
     }
     
 
     func save() {
-        //Create the meme
+        //Create a Meme class instance
         let meme = Meme(stringTop: textTop.text!, stringBottom: textBottom.text!, image: memeImage.image!, memedImage: generateMemedImage())
-        
-        print(meme.stringTop)
-        print(meme.stringBottom)
-        
-        print("saved!")
     }
     
 }
