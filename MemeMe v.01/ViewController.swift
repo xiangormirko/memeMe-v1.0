@@ -26,41 +26,27 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         NSStrokeWidthAttributeName : -4.0
     ]
     
-    // class Meme with initializer
-    class Meme {
+    // A struct model of Meme
+    struct Meme {
         var stringTop: String
         var stringBottom: String
         var image: UIImage
         var memedImage: UIImage
-        
-        init(stringTop: String, stringBottom: String, image: UIImage, memedImage: UIImage) {
-            self.stringTop = stringTop
-            self.stringBottom = stringBottom
-            self.image = image
-            self.memedImage = memedImage
-        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // setting up textFields
-        textTop.delegate = self
-        textBottom.delegate = self
-        textTop.text = "Insert your Text".uppercaseString
-        textBottom.text = "Insert your Text".uppercaseString
-        textTop.defaultTextAttributes = memeTextAttributes
-        textBottom.defaultTextAttributes = memeTextAttributes
-        textTop.textAlignment = NSTextAlignment.Center
-        textBottom.textAlignment = NSTextAlignment.Center
-        textTop.autocapitalizationType = UITextAutocapitalizationType.AllCharacters
+        textFieldSetUp(textTop)
+        textFieldSetUp(textBottom)
         shareButton.enabled = false
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         // Notification subscription
-        self.subscribeToKeyboardNotifications()
-        self.subscribeToKeyboardNotificationDismiss()
+        subscribeToKeyboardNotifications()
+        subscribeToKeyboardNotificationDismiss()
         // Disable camera button if there is no camera
         cameraButton.enabled = UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)
         
@@ -70,8 +56,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         // Notification unsubscription
-        self.unsubscribeFromKeyboardNotifications()
-        self.unsubscribeFromKeyboardNotificationDismiss()
+        unsubscribeFromKeyboardNotifications()
+        unsubscribeFromKeyboardNotificationDismiss()
     }
     
 
@@ -81,7 +67,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let pickerController = UIImagePickerController()
         pickerController.delegate = self
         pickerController.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
-        self.presentViewController(pickerController, animated: true, completion: nil)
+        presentViewController(pickerController, animated: true, completion: nil)
         
         
     }
@@ -90,26 +76,26 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let pickerController = UIImagePickerController()
         pickerController.delegate = self
         pickerController.sourceType = UIImagePickerControllerSourceType.Camera
-        self.presentViewController(pickerController, animated: true, completion: nil)
+        presentViewController(pickerController, animated: true, completion: nil)
         
     }
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
         // set image selected by user
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            self.memeImage.contentMode = .ScaleAspectFill
-            self.memeImage.image = image
+            memeImage.contentMode = .ScaleAspectFill
+            memeImage.image = image
             shareButton.enabled = true
 
 
-            self.dismissViewControllerAnimated(true, completion: nil)
+            dismissViewControllerAnimated(true, completion: nil)
         }
     }
     
     // dismisses the view if the selection is canceled
     func imagePickerControllerDidCancel(picker: UIImagePickerController) {
         print("hello")
-        self.dismissViewControllerAnimated(true, completion: nil)
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     // subscribe to notification
@@ -125,7 +111,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     // triggers when the notification arrives
     func keyboardWillShow(notification: NSNotification) {
-        self.view.frame.origin.y -= getKeyboardHeight(notification)
+        if textBottom.isFirstResponder() {
+        view.frame.origin.y -= getKeyboardHeight(notification)
+        }
     }
     
     // function to obtain keyboard height
@@ -148,7 +136,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     // trigger when the notification arrives
     func keyboardWillHide(notification: NSNotification) {
-        self.view.frame.origin.y += getKeyboardHeight(notification)
+        if textBottom.isFirstResponder() {
+        view.frame.origin.y += getKeyboardHeight(notification)
+        }
     }
     
     // Dismiss keyboard when return is pressed
@@ -186,8 +176,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         toolbar.hidden = true
         textTop.hidden = true
         textBottom.hidden = true
-        UIGraphicsBeginImageContext(self.view.frame.size)
-        self.view.drawViewHierarchyInRect(self.view.frame, afterScreenUpdates: true)
+        UIGraphicsBeginImageContext(view.frame.size)
+        view.drawViewHierarchyInRect(view.frame, afterScreenUpdates: true)
         let memedImage : UIImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         navbar.hidden = false
@@ -205,11 +195,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         let nextController = UIActivityViewController(activityItems: [memedImage], applicationActivities: nil)
         nextController.completionWithItemsHandler = {(type: String?, completed: Bool, returnedItems: [AnyObject]?, error: NSError?) -> Void in
             dispatch_async(dispatch_get_main_queue()){
+                self.save()
                 self.presentingViewController?.dismissViewControllerAnimated(true, completion:nil)
             }
         }
         presentViewController(nextController, animated: true, completion: nil)
-        save()
     }
     
 
@@ -220,15 +210,17 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBAction func cancelReset(sender: AnyObject) {
         // pressing cancel button resets the view to original state
-        self.memeImage.image = nil
-        self.textTop.text = "Insert your Text".uppercaseString
-        textBottom.text = "Insert your Text".uppercaseString
-        textTop.defaultTextAttributes = memeTextAttributes
-        textBottom.defaultTextAttributes = memeTextAttributes
-        textTop.textAlignment = NSTextAlignment.Center
-        textBottom.textAlignment = NSTextAlignment.Center
-        textTop.autocapitalizationType = UITextAutocapitalizationType.AllCharacters
+        memeImage.image = nil
+        textFieldSetUp(textTop)
+        textFieldSetUp(textBottom)
         shareButton.enabled = false
+    }
+    
+    func textFieldSetUp(textfield: UITextField) {
+        textfield.text = "Insert your Text".uppercaseString
+        textfield.defaultTextAttributes = memeTextAttributes
+        textfield.textAlignment = NSTextAlignment.Center
+        textfield.autocapitalizationType = UITextAutocapitalizationType.AllCharacters
     }
 }
 
