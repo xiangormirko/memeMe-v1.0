@@ -169,8 +169,6 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         // capture a meme with overlay text, hide not needed features
         navbar.hidden = true
         toolbar.hidden = true
-        textTop.hidden = true
-        textBottom.hidden = true
         UIGraphicsBeginImageContext(view.frame.size)
         view.drawViewHierarchyInRect(view.frame, afterScreenUpdates: true)
         let memedImage : UIImage = UIGraphicsGetImageFromCurrentImageContext()
@@ -201,6 +199,12 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     func save() {
         //Create a Meme struct instance
         let meme = Meme(stringTop: textTop.text!, stringBottom: textBottom.text!, image: memeImage.image!, memedImage: generateMemedImage())
+        
+        // Add newly created meme to the storage array
+        let object = UIApplication.sharedApplication().delegate
+        let appDelegate = object as! AppDelegate
+        appDelegate.memes.append(meme)
+
     }
     
     @IBAction func cancelReset(sender: AnyObject) {
@@ -209,6 +213,8 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         textFieldSetUp(textTop)
         textFieldSetUp(textBottom)
         shareButton.enabled = false
+        // go back to root view controller
+        self.dismissViewControllerAnimated(true, completion: nil)
     }
     
     func textFieldSetUp(textfield: UITextField) {
